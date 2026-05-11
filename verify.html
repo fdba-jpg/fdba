@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>登録内容の確認・変更</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: "メイリオ", sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 15px;
+    }
+    .container {
+      max-width: 480px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    h2 {
+      color: #003366;
+      margin-top: 0;
+      border-left: 6px solid #003366;
+      padding-left: 10px;
+      font-size: 20px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+      color: #003366;
+      font-size: 14px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      background-color: #0066cc;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #333;
+      background: #eef5ff;
+      padding: 10px;
+      border-left: 4px solid #0066cc;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>登録内容の確認・変更</h2>
+
+    <!-- ★ ユーザID表示欄 -->
+    <label>ユーザID</label>
+    <input type="text" id="userIdField" disabled style="background:#eee;">
+
+    <label>チーム名</label>
+    <input type="text" id="teamName">
+
+    <label>代表者名</label>
+    <input type="text" id="repName">
+
+    <label>メールアドレス1</label>
+    <input type="email" id="mail1">
+
+    <label>メールアドレス2</label>
+    <input type="email" id="mail2">
+
+    <label>電話番号</label>
+    <input type="tel" id="tel" placeholder="例: 09012345678">
+
+    <button onclick="updateInfo()">更新する</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbz1y4lCqQuPYoBdlU4WRNNfB3cA355gB4MgluTw3p3TxcVnTHcqdQIWHZKxpWCqIKja/exec";
+
+    // ==== URL からユーザID取得 ====
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get("id");
+
+    if (!userId) {
+      showMessage("ユーザIDが指定されていません。");
+    } else {
+      document.getElementById("userIdField").value = userId;
+      loadInfo();
+    }
+
+    // ==== 登録情報を取得 ====
+    function loadInfo() {
+      fetch(`${GAS_URL}?mode=get&id=${userId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === "ok") {
+            document.getElementById("teamName").value = data.teamName;
+            document.getElementById("repName").value = data.repName;
+            document.getElementById("mail1").value = data.mail1;
+            document.getElementById("mail2").value = data.mail2;
+            document.getElementById("tel").value = data.tel;
+          } else {
+            showMessage("データが見つかりません。");
+          }
+        })
+        .catch(() => showMessage("通信エラーが発生しました。"));
+    }
+
+    // ==== 更新処理 ====
+    function updateInfo() {
+      const teamName = document.getElementById("teamName").value.trim();
+      const repName = document.getElementById("repName").value.trim();
+      const mail1 = document.getElementById("mail1").value.trim();
+      const mail2 = document.getElementById("mail2").value.trim();
+      const tel = document.getElementById("tel").value.trim();
+
+      // ==== entry.html と同じ入力チェック ====
+
+      if (!teamName || !repName || !mail1 || !tel) {
+        showMessage("必須項目を入力してください。");
+        return;
+      }
+
+      // 電話番号チェック（数字のみ・10〜11桁）
+      const telDigits = tel.replace(/-/g, "");
+      if (!/^[0-9]+$/.test(telDigits) || telDigits.length < 10 || telDigits.length > 11) {
+        showMessage("電話番号は数字のみで10〜11桁で入力してください。");
+        return;
+      }
+
+      const data = {
+        mode: "update",
+        userId: userId,
+        teamName: teamName,
+        repName: repName,
+        mail1: mail1,
+        mail2: mail2,
+        tel: tel
+      };
+
+      fetch(GAS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.status === "ok") {
+          showMessage("更新しました。");
+        } else {
+          showMessage("更新できませんでした。");
+        }
+      })
+      .catch(() => showMessage("通信エラーが発生しました。"));
+    }
+
+    function showMessage(msg) {
+      const result = document.getElementById("result");
+      result.style.display = "block";
+      result.innerHTML = msg;
+    }
+  </script>
+
+</body>
+</html>
