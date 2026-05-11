@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>大会申込フォーム</title>
+  <title>チーム登録フォーム</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
@@ -12,7 +12,6 @@
       margin: 0;
       padding: 15px;
     }
-
     .container {
       max-width: 480px;
       margin: auto;
@@ -21,7 +20,6 @@
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
-
     h2 {
       color: #003366;
       margin-top: 0;
@@ -29,19 +27,16 @@
       padding-left: 10px;
       font-size: 20px;
     }
-
     p {
       font-size: 14px;
       color: #003366;
       line-height: 1.6;
     }
-
     .required {
       color: #cc0000;
       font-size: 12px;
       margin-left: 6px;
     }
-
     label {
       font-weight: bold;
       display: block;
@@ -49,8 +44,7 @@
       color: #003366;
       font-size: 14px;
     }
-
-    input, select {
+    input {
       width: 100%;
       padding: 10px;
       margin-top: 6px;
@@ -59,7 +53,6 @@
       font-size: 15px;
       box-sizing: border-box;
     }
-
     button {
       margin-top: 20px;
       padding: 12px;
@@ -71,11 +64,9 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
     button:disabled {
       background-color: #999;
     }
-
     #result {
       margin-top: 15px;
       font-size: 14px;
@@ -85,27 +76,14 @@
       border-left: 4px solid #0066cc;
       display: none;
     }
-
-    @media (max-width: 480px) {
-      h2 { font-size: 18px; }
-      label { font-size: 13px; }
-      input, select { font-size: 14px; padding: 9px; }
-      button { font-size: 15px; padding: 12px 0; }
-    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>大会申込フォーム</h2>
+    <h2>チーム登録フォーム</h2>
 
-    <p>
-      以下の情報を入力して整理券を取得してください。<br>
-      整理券取得後、メールに記載されたリンクから認証を行うと本登録が完了します。
-    </p>
-
-    <label>メールアドレス <span class="required">※必須</span></label>
-    <input type="email" id="email" required autocomplete="email">
+    <p>以下の情報を入力してください。</p>
 
     <label>チーム名 <span class="required">※必須</span></label>
     <input type="text" id="team" required>
@@ -113,35 +91,34 @@
     <label>代表者名 <span class="required">※必須</span></label>
     <input type="text" id="leader" required>
 
+    <label>メールアドレス1 <span class="required">※必須</span></label>
+    <input type="email" id="email1" required autocomplete="email">
+
+    <label>メールアドレス2</label>
+    <input type="email" id="email2" autocomplete="email">
+
     <label>電話番号 <span class="required">※必須</span></label>
     <input id="phone" type="tel" required
           inputmode="numeric"
-          placeholder="例: 09012345678"
-          title="電話番号は数字のみ（ハイフンなし）で10〜11桁で入力してください">
+          placeholder="例: 09012345678">
 
-    <label>カテゴリ <span class="required">※必須</span></label>
-    <select id="category">
-      <option value="official">オフィシャル</option>
-      <option value="junior">ジュニア</option>
-    </select>
-
-    <button onclick="submitEntry()">整理券を取得する</button>
+    <button onclick="submitEntry()">登録する</button>
 
     <div id="result"></div>
   </div>
 
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbz1y4lCqQuPYoBdlU4WRNNfB3cA355gB4MgluTw3p3TxcVnTHcqdQIWHZKxpWCqIKja/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzIY05rkEQtz9YWiACbj6dKMrTTugXwbMagyjaWkHXIOTYA49BZ-9q_hH81YZvoVSu9/exec";
 
     function submitEntry() {
-      const email = document.getElementById("email").value.trim();
       const team = document.getElementById("team").value.trim();
       const leader = document.getElementById("leader").value.trim();
+      const mail1 = document.getElementById("email1").value.trim();
+      const mail2 = document.getElementById("email2").value.trim();
       const phone = document.getElementById("phone").value.trim();
-      const category = document.getElementById("category").value;
 
-      if (!email || !team || !leader || !phone) {
-        showMessage("すべての項目を入力してください。");
+      if (!team || !leader || !mail1 || !phone) {
+        showMessage("必須項目を入力してください。");
         return;
       }
 
@@ -155,27 +132,24 @@
       showMessage("送信中…");
 
       const data = {
-        email: email,
-        team: team,
-        leader: leader,
-        phone: phone,
-        category: category
+        teamName: team,
+        repName: leader,
+        mail1: mail1,
+        mail2: mail2,
+        tel: phone
       };
 
       fetch(GAS_URL, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       })
       .then(res => res.json())
       .then(res => {
-        if (res.status === "success") {
-          showMessage("整理券を発行しました。メールをご確認ください。");
-        } else if (res.status === "duplicate_email") {
-          showMessage("このメールアドレスはすでに登録されています。");
-        } else if (res.status === "invalid_email") {
-          showMessage("メールアドレスの形式が正しくありません。");
+        if (res.status === "ok") {
+          showMessage("チーム登録を受け付けました。");
         } else {
-          showMessage("エラーが発生しました。時間をおいて再度お試しください。");
+          showMessage("エラーが発生しました。");
         }
         document.querySelector("button").disabled = false;
       })
