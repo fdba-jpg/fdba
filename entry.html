@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>チーム登録フォーム</title>
+  <title>申込フォーム</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
@@ -44,7 +44,7 @@
       color: #003366;
       font-size: 14px;
     }
-    input {
+    input, select {
       width: 100%;
       padding: 10px;
       margin-top: 6px;
@@ -64,78 +64,42 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    button:disabled {
-      background-color: #999;
-      cursor: not-allowed;
-    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>チーム登録フォーム</h2>
+    <h2>申込フォーム</h2>
 
-    <p>以下の情報を入力してください。</p>
+    <form action="https://script.google.com/macros/s/AKfycbz1y4lCqQuPYoBdlU4WRNNfB3cA355gB4MgluTw3p3TxcVnTHcqdQIWHZKxpWCqIKja/exec"
+          method="POST">
 
-    <form id="entryForm">
-      <input type="hidden" name="mode" value="entry">
+      <label>カテゴリ <span class="required">※必須</span></label>
+      <select name="category" required>
+        <option value="">選択してください</option>
+        <option value="official">オフィシャル</option>
+        <option value="junior">ジュニア</option>
+      </select>
 
       <label>チーム名 <span class="required">※必須</span></label>
-      <input type="text" name="teamName" required>
+      <input type="text" name="team" required>
 
       <label>代表者名 <span class="required">※必須</span></label>
-      <input type="text" name="repName" required>
+      <input type="text" name="leader" required>
 
       <label>メールアドレス1 <span class="required">※必須</span></label>
-      <input type="email" name="mail1" required autocomplete="email">
+      <input type="email" name="email" required autocomplete="email">
 
       <label>メールアドレス2</label>
-      <input type="email" name="mail2" autocomplete="email">
+      <input type="email" name="email2" autocomplete="email">
 
       <label>電話番号 <span class="required">※必須</span></label>
-      <input type="tel" name="tel" required placeholder="例: 09012345678">
+      <input type="tel" name="phone" required placeholder="例: 09012345678">
 
-      <button id="submitBtn" type="submit">登録する</button>
+      <button type="submit">登録する</button>
     </form>
 
   </div>
-
-<script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxU-jmswkRfqdg7Ei777WhrHMbzzUxxM7U2LrzEDxquy4TsrDmkBqY1_g48k8u2rucU/exec";
-
-document.getElementById("entryForm").addEventListener("submit", function(e) {
-  e.preventDefault(); // フォームの通常送信を止める
-
-  const btn = document.getElementById("submitBtn");
-  btn.disabled = true;
-  btn.textContent = "送信中…";
-
-  const formData = new FormData(this);
-
-  fetch(GAS_URL, {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.json())
-  .then(res => {
-    if (res.status === "ok") {
-      alert("登録が完了しました！");
-      document.getElementById("entryForm").reset();
-    } else if (res.status === "limit") {
-      alert("受付が上限に達したため一時停止中です。事務局確認後に再開します。");
-    } else {
-      alert("エラーが発生しました。");
-    }
-  })
-  .catch(() => {
-    alert("通信エラーが発生しました。");
-  })
-  .finally(() => {
-    btn.disabled = false;
-    btn.textContent = "登録する";
-  });
-});
-</script>
 
 </body>
 </html>
