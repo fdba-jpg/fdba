@@ -64,15 +64,6 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    #result {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #333;
-      background: #eef5ff;
-      padding: 10px;
-      border-left: 4px solid #0066cc;
-      display: none;
-    }
   </style>
 </head>
 <body>
@@ -84,6 +75,8 @@
 
     <form action="https://script.google.com/macros/s/AKfycbws0_ijCHJUd31B9nABcyzZVuwON9-fWKXsZaYRcf3g8_WCIPqgfedAD9j4Ev4NwrRG/exec"
           method="POST">
+
+      <input type="hidden" name="mode" value="entry">
 
       <label>チーム名 <span class="required">※必須</span></label>
       <input type="text" name="teamName" required>
