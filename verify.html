@@ -27,16 +27,6 @@
       padding-left: 10px;
       font-size: 20px;
     }
-    p {
-      font-size: 14px;
-      color: #003366;
-      line-height: 1.6;
-    }
-    .required {
-      color: #cc0000;
-      font-size: 12px;
-      margin-left: 6px;
-    }
     label {
       font-weight: bold;
       display: block;
@@ -64,15 +54,6 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    #result {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #333;
-      background: #eef5ff;
-      padding: 10px;
-      border-left: 4px solid #0066cc;
-      display: none;
-    }
   </style>
 </head>
 <body>
@@ -80,15 +61,10 @@
   <div class="container">
     <h2>登録内容の確認・変更</h2>
 
-    <form id="loadForm"
+    <!-- 更新フォーム（POST） -->
+    <form id="updateForm"
       action="https://script.google.com/macros/s/AKfycbws0_ijCHJUd31B9nABcyzZVuwON9-fWKXsZaYRcf3g8_WCIPqgfedAD9j4Ev4NwrRG/exec"
-      method="POST" target="hiddenFrame">
-      <input type="hidden" name="mode" value="get">
-      <input type="hidden" name="userId" id="hiddenUserId">
-    </form>
-
-    <form action="https://script.google.com/macros/s/AKfycbws0_ijCHJUd31B9nABcyzZVuwON9-fWKXsZaYRcf3g8_WCIPqgfedAD9j4Ev4NwrRG/exec"
-          method="POST">
+      method="POST">
 
       <label>ユーザID</label>
       <input type="text" id="userIdField" disabled style="background:#eee;">
@@ -115,19 +91,34 @@
     </form>
   </div>
 
-  <iframe name="hiddenFrame" style="display:none;"></iframe>
-
   <script>
     const params = new URLSearchParams(window.location.search);
     const userId = params.get("id");
 
-    if (userId) {
-      document.getElementById("userIdField").value = userId;
-      document.getElementById("hiddenUserId").value = userId;
-      document.getElementById("userIdHidden2").value = userId;
-      document.getElementById("loadForm").submit();
-    } else {
+    if (!userId) {
       alert("ユーザIDが指定されていません。");
+    } else {
+      // 画面にセット
+      document.getElementById("userIdField").value = userId;
+      document.getElementById("userIdHidden2").value = userId;
+
+      const url =
+        "https://script.google.com/macros/s/AKfycbws0_ijCHJUd31B9nABcyzZVuwON9-fWKXsZaYRcf3g8_WCIPqgfedAD9j4Ev4NwrRG/exec"
+        + "?mode=get&userId=" + encodeURIComponent(userId);
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("teamName").value = data.teamName || "";
+          document.getElementById("repName").value = data.repName || "";
+          document.getElementById("mail1").value = data.mail1 || "";
+          document.getElementById("mail2").value = data.mail2 || "";
+          document.getElementById("tel").value = data.tel || "";
+        })
+        .catch(err => {
+          console.error("読み込みエラー:", err);
+          alert("データの読み込みに失敗しました");
+        });
     }
   </script>
 
