@@ -13,7 +13,7 @@
       padding: 15px;
     }
     .container {
-//      max-width: 480px;
+      max-width: 480px;
       min-height: 100vh;
       margin: auto;
       background: #fff;
@@ -65,9 +65,6 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    button:disabled {
-      background-color: #999;
-    }
     #result {
       margin-top: 15px;
       font-size: 14px;
@@ -86,86 +83,28 @@
 
     <p>以下の情報を入力してください。</p>
 
-    <label>チーム名 <span class="required">※必須</span></label>
-    <input type="text" id="team" required>
+    <form action="https://script.google.com/macros/s/AKfycbws0_ijCHJUd31B9nABcyzZVuwON9-fWKXsZaYRcf3g8_WCIPqgfedAD9j4Ev4NwrRG/exec"
+          method="POST">
 
-    <label>代表者名 <span class="required">※必須</span></label>
-    <input type="text" id="leader" required>
+      <label>チーム名 <span class="required">※必須</span></label>
+      <input type="text" name="teamName" required>
 
-    <label>メールアドレス1 <span class="required">※必須</span></label>
-    <input type="email" id="email1" required autocomplete="email">
+      <label>代表者名 <span class="required">※必須</span></label>
+      <input type="text" name="repName" required>
 
-    <label>メールアドレス2</label>
-    <input type="email" id="email2" autocomplete="email">
+      <label>メールアドレス1 <span class="required">※必須</span></label>
+      <input type="email" name="mail1" required autocomplete="email">
 
-    <label>電話番号 <span class="required">※必須</span></label>
-    <input id="phone" type="tel" required
-          inputmode="numeric"
-          placeholder="例: 09012345678">
+      <label>メールアドレス2</label>
+      <input type="email" name="mail2" autocomplete="email">
 
-    <button onclick="submitEntry()">登録する</button>
+      <label>電話番号 <span class="required">※必須</span></label>
+      <input type="tel" name="tel" required placeholder="例: 09012345678">
 
-    <div id="result"></div>
+      <button type="submit">登録する</button>
+    </form>
+
   </div>
-
-  <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbws0_ijCHJUd31B9nABcyzZVuwON9-fWKXsZaYRcf3g8_WCIPqgfedAD9j4Ev4NwrRG/exec";
-
-    function submitEntry() {
-      const team = document.getElementById("team").value.trim();
-      const leader = document.getElementById("leader").value.trim();
-      const mail1 = document.getElementById("email1").value.trim();
-      const mail2 = document.getElementById("email2").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-
-      if (!team || !leader || !mail1 || !phone) {
-        showMessage("必須項目を入力してください。");
-        return;
-      }
-
-      const phoneDigits = phone.replace(/-/g, "");
-      if (!/^[0-9]+$/.test(phoneDigits) || phoneDigits.length < 10 || phoneDigits.length > 11) {
-        showMessage("電話番号は数字のみで10〜11桁で入力してください。");
-        return;
-      }
-
-      document.querySelector("button").disabled = true;
-      showMessage("送信中…");
-
-      const data = {
-        teamName: team,
-        repName: leader,
-        mail1: mail1,
-        mail2: mail2,
-        tel: phone
-      };
-
-      fetch(GAS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      })
-      .then(res => res.json())
-      .then(res => {
-        if (res.status === "ok") {
-          showMessage("チーム登録を受け付けました。");
-        } else {
-          showMessage("エラーが発生しました。");
-        }
-        document.querySelector("button").disabled = false;
-      })
-      .catch(() => {
-        showMessage("通信エラーが発生しました。");
-        document.querySelector("button").disabled = false;
-      });
-    }
-
-    function showMessage(msg) {
-      const result = document.getElementById("result");
-      result.style.display = "block";
-      result.innerHTML = msg;
-    }
-  </script>
 
 </body>
 </html>
