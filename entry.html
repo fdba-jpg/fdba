@@ -72,7 +72,7 @@
     <h2>申込フォーム</h2>
 
     <form id="entryForm"
-          action="https://script.google.com/macros/s/AKfycbxU-jmswkRfqdg7Ei777WhrHMbzzUxxM7U2LrzEDxquy4TsrDmkBqY1_g48k8u2rucU/exec"
+          action="https://script.google.com/macros/s/AKfycbz1y4lCqQuPYoBdlU4WRNNfB3cA355gB4MgluTw3p3TxcVnTHcqdQIWHZKxpWCqIKja/exec"
           method="POST">
 
       <label>カテゴリ <span class="required">※必須</span></label>
@@ -103,49 +103,55 @@
   </div>
 
 <script>
-document.getElementById("entryForm").addEventListener("submit", function(e) {
-  e.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
 
-  const form = e.target;
-  const formData = new FormData(form);
+  const form = document.getElementById("entryForm");
 
-  fetch(form.action, {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.json())
-  .then(res => {
-    switch(res.status) {
-      case "ok":
-        alert("登録が完了しました。メール認証を行ってください。");
-        form.reset();
-        break;
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
 
-      case "invalid_category":
-        alert("カテゴリが不正です。");
-        break;
+    const formData = new FormData(form);
 
-      case "invalid_email":
-        alert("メールアドレスの形式が正しくありません。");
-        break;
+    fetch(form.action, {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(res => {
+      switch(res.status) {
+        case "ok":
+          alert("登録が完了しました。メール認証を行ってください。");
+          form.reset();
+          break;
 
-      case "duplicate":
-        alert("このメールアドレスはすでに登録されています。");
-        break;
+        case "invalid_category":
+          alert("カテゴリが不正です。");
+          break;
 
-      case "limit":
-        alert("受付が上限に達しました。");
-        break;
+        case "invalid_email":
+          alert("メールアドレスの形式が正しくありません。");
+          break;
 
-      default:
-        alert("サーバーエラーが発生しました。");
-    }
-  })
-  .catch(() => {
-    alert("通信エラーが発生しました。");
+        case "duplicate":
+          alert("このメールアドレスはすでに登録されています。");
+          break;
+
+        case "limit":
+          alert("受付が上限に達しました。");
+          break;
+
+        default:
+          alert("サーバーエラーが発生しました。");
+      }
+    })
+    .catch(() => {
+      alert("通信エラーが発生しました。");
+    });
   });
+
 });
 </script>
+
 
 </body>
 </html>
